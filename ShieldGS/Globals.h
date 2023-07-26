@@ -11,6 +11,7 @@ namespace Globals {
 	APlayerController* Controller;
 	AFortPlayerControllerAthena* GameController;
 	UGameplayStatics* GameplayStatics;
+	AAthena_GameState_C* GameState;
 
 	static auto BaseTransform = FTransform{};
 }

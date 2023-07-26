@@ -14,24 +14,6 @@ static void SetupOthers() {
     Globals::Controller = Globals::Engine->GameInstance->LocalPlayers[0]->PlayerController;
 }
 
-static SDK::AActor* SpawnActor(SDK::UClass* ActorClass, SDK::FVector Location, SDK::FRotator Rotation)
-{
-    SDK::FQuat Quat;
-    SDK::FTransform Transform;
-    Quat.W = 0;
-    Quat.X = Rotation.Pitch;
-    Quat.Y = Rotation.Roll;
-    Quat.Z = Rotation.Yaw;
-
-    Transform.Rotation = Quat;
-    Transform.Scale3D = SDK::FVector{ 1,1,1 };
-    Transform.Translation = Location;
-
-    auto Actor = ((UGameplayStatics*)UGameplayStatics::StaticClass())->STATIC_BeginSpawningActorFromClass(Globals::Engine->GameViewport->World, ActorClass, Transform, false, nullptr);
-    ((UGameplayStatics*)UGameplayStatics::StaticClass())->STATIC_FinishSpawningActor(Actor, Transform);
-    return Actor;
-}
-
 static bool bHasStarted = false;
 
 static bool bHasDroppedLS = false;
@@ -66,6 +48,8 @@ static void* ProcessEventHook(UObject* Object, UFunction* Function, void* Params
 
             Globals::GameController = Controller;
 
+            Globals::GameState = GameState;
+
             Globals::GameController->CheatManager = reinterpret_cast<UCheatManager*>(GetGameplayStatics()->STATIC_SpawnObject(UCheatManager::StaticClass(), Globals::GameController));
 
             FTransform SpawnPos = Globals::BaseTransform;
@@ -90,6 +74,7 @@ static void* ProcessEventHook(UObject* Object, UFunction* Function, void* Params
                 UCustomCharacterPart* Part = Hero->CharacterParts[i];
                 ((APlayerPawn_Athena_C*)Pawn)->ServerChoosePart(Part->CharacterPartType, Part);
             }
+
             ((AFortPlayerStateAthena*)PlayerState)->OnRep_CharacterParts();
 
             UFortPlaylistAthena* Playlist = UObject::FindObject<UFortPlaylistAthena>("FortPlaylistAthena Playlist_Playground.Playlist_Playground");
@@ -113,7 +98,14 @@ static void* ProcessEventHook(UObject* Object, UFunction* Function, void* Params
     if (FunName.find("ServerLoadingScreenDropped") != std::string::npos) {
         if (bHasDroppedLS == false) {
             bHasDroppedLS = true;
-
+            UTexture2D* MiniMap_Texture = UObject::FindObject<UTexture2D>("Texture2D MiniMapAthena.MiniMapAthena");
+            Globals::GameState->MinimapBackgroundBrush.ResourceObject = MiniMap_Texture;
+            Globals::GameState->MinimapSafeZoneBrush = {};
+            Globals::GameState->MinimapCircleBrush = {};
+            Globals::GameState->MinimapNextCircleBrush = {};
+            Globals::GameState->FullMapCircleBrush = {};
+            Globals::GameState->FullMapNextCircleBrush = {};
+            Globals::GameState->MinimapSafeZoneBrush = {};
         }
     }
 
