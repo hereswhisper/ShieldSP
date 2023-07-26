@@ -1,2 +1,2 @@
 # ShieldSP
-A open-source SinglePlayer DLL for Fortnite 3.5
+ShieldSP is a attempt of a open source Singleplayer DLL for Fortnite 3.5 (I'll complete it probably soon!)
